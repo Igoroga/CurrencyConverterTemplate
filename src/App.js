@@ -3,6 +3,7 @@ import Block from './Block';
 import './index.scss';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { useRef } from 'react';
 
 function App() {
   const [fromCurency, setFromCurency] = useState('RUB')
@@ -11,17 +12,30 @@ function App() {
   const [toPrice, setToPrice] = useState('')
   const [rates, setRates] = useState({RUB:1})
 
-  const onChangeFromCurrency = (value) => {
+
+  
+
+  const onChangeFromPrice = (value) => {
     const prise = value/rates[fromCurency]
-    setToPrice(prise*rates[toCurency])
+    setToPrice((prise*rates[toCurency]).toFixed(3))
     setFromPrice(value)
   }
 
-  const onChangeToCurrency = (value) => {
+  const onChangeToPrice = (value) => {
     const prise = value/rates[toCurency]
-    setFromPrice(prise*rates[fromCurency])
+    setFromPrice((prise*rates[fromCurency]).toFixed(3))
     setToPrice(value)
   }
+
+  
+useEffect(() => {
+  onChangeToPrice(toPrice)
+},[toCurency])
+
+
+useEffect(() => {
+  onChangeFromPrice(fromPrice)
+},[fromCurency])
 
   useEffect(() => {
     fetch("https://www.cbr-xml-daily.ru/latest.js")
@@ -39,8 +53,8 @@ function App() {
 
   return (
     <div className="App">
-      <Block value={fromPrice} onChangeValue={onChangeFromCurrency} currency={fromCurency} onChangeCurrency={(cur) => setFromCurency(cur)} />
-      <Block value={toPrice} onChangeValue={onChangeToCurrency} currency={toCurency} onChangeCurrency={(cur) => setToCurency(cur)} />
+      <Block value={fromPrice} onChangeValue={onChangeFromPrice} currency={fromCurency} onChangeCurrency={(cur) => setFromCurency(cur)} />
+      <Block value={toPrice} onChangeValue={onChangeToPrice} currency={toCurency} onChangeCurrency={(cur) => setToCurency(cur)} />
     </div>
   );
 }
